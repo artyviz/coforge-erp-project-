@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Faculty — University ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Faculty <span class="text-muted text-sm">({{ total }})</span></h1>
+</div>
+
+{% if faculty %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Rank</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for f in faculty %}
+        <tr>
+            <td>{{ f.first_name }} {{ f.last_name }}</td>
+            <td class="text-muted">{{ f.email }}</td>
+            <td>
+                {% set rank = f.rank | replace("_", " ") | title %}
+                <span class="badge badge-blue">{{ rank }}</span>
+            </td>
+            <td>
+                {% if f.get("is_active", true) %}
+                <span class="badge badge-green">Active</span>
+                {% else %}
+                <span class="badge badge-gray">Inactive</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">No faculty found.</p>
+{% endif %}
+{% endblock %}

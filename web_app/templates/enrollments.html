@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Enrollments — University ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Enrollments</h1>
+</div>
+
+<!-- Enroll form (admin/faculty only) -->
+{% if user and user.role in ['admin', 'faculty'] %}
+<details class="mb-4">
+    <summary class="btn btn-primary">+ Enroll student</summary>
+    <form action="/enrollments/enroll" method="post" class="mt-4" style="max-width:600px;">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Student</label>
+                <select name="student_id" required>
+                    <option value="">Select student…</option>
+                    {% for s in students %}
+                    <option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Course</label>
+                <select name="course_id" required>
+                    <option value="">Select course…</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id }}">{{ c.code }} — {{ c.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group" style="max-width:200px;">
+            <label>Semester</label>
+            <input type="text" name="semester" placeholder="Spring 2026" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Enroll</button>
+    </form>
+</details>
+{% endif %}
+
+{% if enrollments %}
+<table>
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Title</th>
+            <th>Credits</th>
+            <th>Semester</th>
+            <th>Status</th>
+            <th>Grade</th>
+            {% if user and user.role in ['admin', 'faculty'] %}
+            <th></th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in enrollments %}
+        <tr>
+            <td><strong>{{ e.course_code }}</strong></td>
+            <td>{{ e.course_title }}</td>
+            <td>{{ e.credits }}</td>
+            <td>{{ e.semester }}</td>
+            <td>
+                {% if e.status == 'completed' %}
+                <span class="badge badge-green">Completed</span>
+                {% elif e.status == 'registered' %}
+                <span class="badge badge-blue">Registered</span>
+                {% elif e.status == 'in_progress' %}
+                <span class="badge badge-blue">In Progress</span>
+                {% elif e.status == 'withdrawn' %}
+                <span class="badge badge-gray">Withdrawn</span>
+                {% elif e.status == 'failed' %}
+                <span class="badge badge-red">Failed</span>
+                {% endif %}
+            </td>
+            <td>{{ e.grade or "—" }}</td>
+            {% if user and user.role in ['admin', 'faculty'] %}
+            <td>
+                {% if e.status in ['registered', 'in_progress'] %}
+                <a href="/enrollments/{{ e.id }}/drop" class="btn btn-sm btn-danger"
+                    onclick="return confirm('Drop this enrollment?')">Drop</a>
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">No enrollments found.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Courses — University ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Courses</h1>
+</div>
+
+<!-- Add form (admin/faculty only) -->
+{% if user and user.role in ['admin', 'faculty'] %}
+<details class="mb-4">
+    <summary class="btn btn-primary">+ Add course</summary>
+    <form action="/courses/add" method="post" class="mt-4" style="max-width:600px;">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Code</label>
+                <input type="text" name="code" placeholder="CS101" required>
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Credits</label>
+                <input type="number" name="credits" min="1" max="6" value="3" required>
+            </div>
+            <div class="form-group">
+                <label>Capacity</label>
+                <input type="number" name="capacity" min="1" value="60" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</details>
+{% endif %}
+
+
+{% if courses %}
+<table>
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Title</th>
+            <th>Credits</th>
+            <th>Capacity</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in courses %}
+        <tr>
+            <td><strong>{{ c.code }}</strong></td>
+            <td>{{ c.title }}</td>
+            <td>{{ c.credits }}</td>
+            <td>{{ c.capacity }}</td>
+            <td>
+                {% if c.status == 'active' %}
+                <span class="badge badge-green">Active</span>
+                {% else %}
+                <span class="badge badge-gray">{{ c.status }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">No courses found.</p>
+{% endif %}
+{% endblock %}

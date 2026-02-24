@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — University ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+</div>
+
+<div class="stats">
+    <div class="stat">
+        <div class="stat-value">{{ stats.total_students | default(0) }}</div>
+        <div class="stat-label">Total students</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value">{{ stats.active_students | default(0) }}</div>
+        <div class="stat-label">Active students</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value">{{ stats.total_courses | default(0) }}</div>
+        <div class="stat-label">Courses</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value">{{ stats.total_departments | default(0) }}</div>
+        <div class="stat-label">Departments</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value">{{ "%.2f" | format(stats.average_gpa | default(0)) }}</div>
+        <div class="stat-label">Average GPA</div>
+    </div>
+</div>
+
+{% if departments %}
+<h2 class="mb-4" style="font-size:16px;font-weight:600;">Departments</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Department</th>
+            <th>Students</th>
+            <th>Avg GPA</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in departments %}
+        <tr>
+            <td>{{ d.department_name }}</td>
+            <td>{{ d.student_count }}</td>
+            <td>{{ "%.2f" | format(d.avg_gpa) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">No department data available. Make sure the Rust API is running.</p>
+{% endif %}
+{% endblock %}
