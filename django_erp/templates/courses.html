@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Courses - University ERP{% endblock %}
+{% block page_title %}Academic Catalog{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    {% for course in courses %}
+    <div class="stat-card" style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <span
+                style="background: var(--secondary); color: white; padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 700; font-size: 0.75rem;">
+                {{ course.code }}
+            </span>
+            <span style="color: var(--text-muted); font-size: 0.75rem;"><i class="fas fa-users"></i> {{ course.capacity
+                }} max</span>
+        </div>
+        <h3 style="color: var(--primary); font-size: 1.1rem; text-transform: none; margin-top: 0.5rem;">{{ course.name
+            }}</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); flex: 1;">{{ course.description|truncatewords:20 }}</p>
+        <div
+            style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1rem;">
+            <span style="font-weight: 600; color: var(--secondary);">{{ course.credits }} Credits</span>
+            <button class="btn" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.75rem;">Details</button>
+        </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 5rem;">
+        <i class="fas fa-book-open" style="font-size: 3rem; color: var(--border); margin-bottom: 1rem;"></i>
+        <p style="color: var(--text-muted);">No courses registered in the system.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
