@@ -1,106 +1,63 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account — University ERP</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Register — University ERP</title>
     <link rel="stylesheet" href="/static/style.css">
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    </style>
 </head>
 
-<body class="min-h-full bg-gradient-to-br from-slate-50 to-indigo-50 flex items-center justify-center p-6">
+<body>
+    <div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f6f8fa;">
+        <div style="width:400px;background:#fff;border:1px solid #d0d7de;border-radius:6px;padding:24px;">
+            <h2 style="text-align:center;margin-bottom:4px;">Create Account</h2>
+            <p style="text-align:center;color:#57606a;font-size:13px;margin-bottom:20px;">Join the University ERP system
+            </p>
 
-    <div class="w-full max-w-md">
-
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-13 h-13 bg-indigo-600 rounded-2xl mb-4 shadow-lg shadow-indigo-200 p-3">
-                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                </svg>
-            </div>
-            <h1 class="text-2xl font-bold text-slate-900">Create your account</h1>
-            <p class="text-slate-500 text-sm mt-1.5">Join the University ERP system</p>
-        </div>
-
-        <!-- Card -->
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200/60 p-8">
-
-            <!-- Error alert -->
             {% if error %}
-            <div class="flex items-start gap-3 px-4 py-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm mb-6">
-                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{{ error }}</span>
+            <div
+                style="background:#ffebe9;border:1px solid #ff8182;color:#82071e;padding:8px 12px;border-radius:6px;margin-bottom:16px;font-size:13px;">
+                {{ error }}
             </div>
             {% endif %}
 
-            <form action="/register" method="post" class="space-y-5">
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Full name</label>
-                    <input type="text" name="full_name"
-                           class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400
-                                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                           placeholder="e.g. Farhan Umar">
+            <form action="/register" method="post">
+                <div class="form-group">
+                    <label>Full name</label>
+                    <input type="text" name="full_name" placeholder="e.g. Farhan Umar">
                 </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
-                        <input type="text" name="username" required
-                               class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400
-                                      focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                               placeholder="username">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" name="username" required>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Role</label>
-                        <select name="role"
-                                class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-900 bg-white
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select name="role">
                             <option value="student">Student</option>
                             <option value="faculty">Faculty</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
-                    <input type="email" name="email" required
-                           class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400
-                                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                           placeholder="you@university.edu">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
-                    <input type="password" name="password" minlength="6" required
-                           class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400
-                                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                           placeholder="Min. 6 characters">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" minlength="6" required>
                 </div>
-
-                <button type="submit"
-                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl
-                               hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors mt-2">
-                    Create account
-                </button>
-
+                <button type="submit" class="btn btn-primary"
+                    style="width:100%;justify-content:center;margin-top:4px;">Create account</button>
             </form>
 
-            <p class="text-center text-sm text-slate-500 mt-6">
-                Already have an account?
-                <a href="/login" class="text-indigo-600 font-semibold hover:text-indigo-700">Sign in</a>
+            <p style="text-align:center;margin-top:16px;font-size:13px;color:#57606a;">
+                Already have an account? <a href="/login">Sign in</a>
             </p>
         </div>
     </div>
-
 </body>
+
 </html>

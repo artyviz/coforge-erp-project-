@@ -251,34 +251,9 @@ async def departments_list(request: Request):
         return redirect
     token = get_token(request)
     user = get_user(request)
-
     depts = await api_get("/api/departments", token)
     if not isinstance(depts, list):
         depts = []
-
-    fac_result = await api_get("/api/faculty", token)
-    crs_result = await api_get("/api/courses", token)
-
-    # Count faculty per department_id
-    fac_counts: dict = {}
-    for f in (fac_result.get("data", []) if isinstance(fac_result, dict) else []):
-        d = f.get("department_id")
-        if d:
-            fac_counts[d] = fac_counts.get(d, 0) + 1
-
-    # Count courses per department_id
-    crs_counts: dict = {}
-    for c in (crs_result.get("data", []) if isinstance(crs_result, dict) else []):
-        d = c.get("department_id")
-        if d:
-            crs_counts[d] = crs_counts.get(d, 0) + 1
-
-    # Inject counts into each department dict
-    for dept in depts:
-        dept_id = dept.get("id", "")
-        dept["faculty_count"] = fac_counts.get(dept_id, 0)
-        dept["course_count"] = crs_counts.get(dept_id, 0)
-
     return templates.TemplateResponse("departments.html", {
         "request": request,
         "departments": depts,
@@ -358,3 +333,19 @@ async def drop_enrollment(request: Request, enrollment_id: str):
     token = get_token(request)
     await api_delete(f"/api/enrollments/{enrollment_id}/drop", token)
     return RedirectResponse(url="/enrollments", status_code=303)
+@app.get("/departments", response_class=HTMLResponse)
+async def departments_list(request: Request):
+    redirect = require_login(request)
+    if redirect:
+        return redirect
+    token = get_token(request)
+    user = get_user(request)
+    depts = await api_get("/api/departments", token)
+    if not isinstance(depts, list):
+        depts = []
+    return templates.TemplateResponse("departments.html", {
+        "request": request,
+        "departments": depts,
+        "page": "departments",
+        "user": user,
+    })

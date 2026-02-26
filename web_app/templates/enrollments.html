@@ -2,258 +2,93 @@
 {% block title %}Enrollments — University ERP{% endblock %}
 
 {% block content %}
-<div class="p-8" x-data="{ showEnroll: false }">
-
-    <!-- ── Page header ──────────────────────── -->
-    <div class="flex items-start justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-900">Enrollments</h1>
-            <p class="text-slate-500 text-sm mt-1">{{ enrollments | length }} enrollment record{{ 's' if enrollments | length != 1 else '' }}</p>
-        </div>
-        {% if user and user.role in ['admin', 'faculty'] %}
-        <button @click="showEnroll = true"
-                class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Enroll Student
-        </button>
-        {% endif %}
-    </div>
-
-    <!-- ── Table ──────────────────────────── -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        {% if enrollments %}
-        <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-slate-200 bg-slate-50/70">
-                    {% if user and user.role in ['admin', 'faculty'] %}
-                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Student</th>
-                    {% endif %}
-                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Course</th>
-                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Title</th>
-                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Credits</th>
-                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Semester</th>
-                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
-                    {% if user and user.role in ['admin', 'faculty'] %}
-                    <th class="px-5 py-3.5"></th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                {% for e in enrollments %}
-                <tr class="hover:bg-slate-50/60 transition-colors">
-
-                    <!-- Student (admin/faculty view only) -->
-                    {% if user and user.role in ['admin', 'faculty'] %}
-                    <td class="px-5 py-4">
-                        {% set matched = students | selectattr('id', 'equalto', e.student_id) | list %}
-                        {% if matched %}
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center text-indigo-700 text-[10px] font-bold flex-shrink-0">
-                                {{ matched[0].first_name[:1] | upper }}{{ matched[0].last_name[:1] | upper }}
-                            </div>
-                            <span class="text-sm font-medium text-slate-800 whitespace-nowrap">{{ matched[0].first_name }} {{ matched[0].last_name }}</span>
-                        </div>
-                        {% else %}
-                        <span class="text-xs text-slate-400 font-mono">{{ (e.student_id | string)[:8] }}…</span>
-                        {% endif %}
-                    </td>
-                    {% endif %}
-
-                    <!-- Course code -->
-                    <td class="px-5 py-4">
-                        {% if e.course_code %}
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700 font-mono tracking-wide">
-                            {{ e.course_code }}
-                        </span>
-                        {% else %}
-                        <span class="text-slate-400 text-xs font-mono">{{ (e.course_id | string)[:8] }}…</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Title -->
-                    <td class="px-5 py-4 font-medium text-slate-800">
-                        {{ e.course_title | default('—') }}
-                    </td>
-
-                    <!-- Credits -->
-                    <td class="px-5 py-4">
-                        {% if e.credits %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">{{ e.credits }} cr</span>
-                        {% else %}
-                        <span class="text-slate-400 text-xs">—</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Semester -->
-                    <td class="px-5 py-4 text-slate-500 text-xs whitespace-nowrap">{{ e.semester }}</td>
-
-                    <!-- Status -->
-                    <td class="px-5 py-4">
-                        {% if e.status == 'completed' %}
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                            Completed
-                        </span>
-                        {% elif e.status == 'in_progress' %}
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800">
-                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
-                            In Progress
-                        </span>
-                        {% elif e.status == 'registered' %}
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                            Registered
-                        </span>
-                        {% elif e.status == 'withdrawn' %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">Withdrawn</span>
-                        {% elif e.status == 'failed' %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800">Failed</span>
-                        {% else %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">{{ e.status | title }}</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Grade -->
-                    <td class="px-5 py-4">
-                        {% if e.grade %}
-                        {% if e.grade in ['A+', 'A', 'A-'] %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-bold bg-emerald-100 text-emerald-800">{{ e.grade }}</span>
-                        {% elif e.grade in ['B+', 'B', 'B-'] %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-bold bg-sky-100 text-sky-800">{{ e.grade }}</span>
-                        {% elif e.grade in ['C+', 'C', 'C-'] %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-bold bg-amber-100 text-amber-800">{{ e.grade }}</span>
-                        {% else %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-bold bg-rose-100 text-rose-800">{{ e.grade }}</span>
-                        {% endif %}
-                        {% else %}
-                        <span class="text-slate-300 text-sm">—</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Drop action -->
-                    {% if user and user.role in ['admin', 'faculty'] %}
-                    <td class="px-5 py-4">
-                        {% if e.status in ['registered', 'in_progress'] %}
-                        <a href="/enrollments/{{ e.id }}/drop"
-                           onclick="return confirm('Drop this enrollment? The student will be withdrawn from the course.')"
-                           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-rose-600 rounded-lg border border-rose-200 hover:bg-rose-50 hover:border-rose-300 transition-colors whitespace-nowrap">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Drop
-                        </a>
-                        {% endif %}
-                    </td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        </div>
-        {% else %}
-        <div class="flex flex-col items-center justify-center py-20 text-slate-400">
-            <svg class="w-14 h-14 mb-4 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-            <p class="text-base font-semibold text-slate-500">No enrollments found</p>
-            <p class="text-sm mt-1.5">Enroll a student in a course to get started</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- ── Enroll Student Modal ───────────── -->
-    {% if user and user.role in ['admin', 'faculty'] %}
-
-    <!-- Backdrop -->
-    <div x-show="showEnroll" x-cloak @click="showEnroll = false"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40">
-    </div>
-
-    <!-- Modal -->
-    <div x-show="showEnroll" x-cloak
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 scale-95"
-         x-transition:enter-end="opacity-100 scale-100"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-95"
-         class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg" @click.stop>
-
-            <!-- Modal header -->
-            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Enroll Student</h2>
-                    <p class="text-sm text-slate-500 mt-0.5">Assign a student to a course for a semester</p>
-                </div>
-                <button @click="showEnroll = false"
-                        class="text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg p-1.5 transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Modal body -->
-            <form action="/enrollments/enroll" method="post" class="p-6 space-y-4">
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Student</label>
-                    <select name="student_id" required
-                            class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-900 bg-white
-                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                        <option value="">Select student…</option>
-                        {% for s in students %}
-                        <option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Course</label>
-                    <select name="course_id" required
-                            class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-900 bg-white
-                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                        <option value="">Select course…</option>
-                        {% for c in courses %}
-                        <option value="{{ c.id }}">{{ c.code }} — {{ c.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Semester</label>
-                    <input type="text" name="semester" required placeholder="e.g. Spring 2026"
-                           class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400
-                                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                </div>
-
-                <!-- Actions -->
-                <div class="flex gap-3 pt-2">
-                    <button type="submit"
-                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors">
-                        Enroll Student
-                    </button>
-                    <button type="button" @click="showEnroll = false"
-                            class="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-200 transition-colors">
-                        Cancel
-                    </button>
-                </div>
-            </form>
-
-        </div>
-    </div>
-    {% endif %}
-
+<div class="page-header">
+    <h1>Enrollments</h1>
 </div>
+
+<!-- Enroll form (admin/faculty only) -->
+{% if user and user.role in ['admin', 'faculty'] %}
+<details class="mb-4">
+    <summary class="btn btn-primary">+ Enroll student</summary>
+    <form action="/enrollments/enroll" method="post" class="mt-4" style="max-width:600px;">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Student</label>
+                <select name="student_id" required>
+                    <option value="">Select student…</option>
+                    {% for s in students %}
+                    <option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Course</label>
+                <select name="course_id" required>
+                    <option value="">Select course…</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id }}">{{ c.code }} — {{ c.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group" style="max-width:200px;">
+            <label>Semester</label>
+            <input type="text" name="semester" placeholder="Spring 2026" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Enroll</button>
+    </form>
+</details>
+{% endif %}
+
+{% if enrollments %}
+<table>
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Title</th>
+            <th>Credits</th>
+            <th>Semester</th>
+            <th>Status</th>
+            <th>Grade</th>
+            {% if user and user.role in ['admin', 'faculty'] %}
+            <th></th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in enrollments %}
+        <tr>
+            <td><strong>{{ e.course_code }}</strong></td>
+            <td>{{ e.course_title }}</td>
+            <td>{{ e.credits }}</td>
+            <td>{{ e.semester }}</td>
+            <td>
+                {% if e.status == 'completed' %}
+                <span class="badge badge-green">Completed</span>
+                {% elif e.status == 'registered' %}
+                <span class="badge badge-blue">Registered</span>
+                {% elif e.status == 'in_progress' %}
+                <span class="badge badge-blue">In Progress</span>
+                {% elif e.status == 'withdrawn' %}
+                <span class="badge badge-gray">Withdrawn</span>
+                {% elif e.status == 'failed' %}
+                <span class="badge badge-red">Failed</span>
+                {% endif %}
+            </td>
+            <td>{{ e.grade or "—" }}</td>
+            {% if user and user.role in ['admin', 'faculty'] %}
+            <td>
+                {% if e.status in ['registered', 'in_progress'] %}
+                <a href="/enrollments/{{ e.id }}/drop" class="btn btn-sm btn-danger"
+                    onclick="return confirm('Drop this enrollment?')">Drop</a>
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">No enrollments found.</p>
+{% endif %}
 {% endblock %}
