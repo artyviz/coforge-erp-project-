@@ -1,0 +1,7 @@
+# Override: use fixed Dockerfile for rust_api (adds 'touch' to force Cargo
+# to detect source files as newer than the dummy-build fingerprints).
+services:
+  rust_api:
+    build:
+      context: ./rust_api
+      dockerfile: ../Dockerfile.rust_api
